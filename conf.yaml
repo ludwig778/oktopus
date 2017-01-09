@@ -1,0 +1,40 @@
+default: &DEFAULT
+  branch: master
+  ssl: true
+  scale: 1
+
+environment: &ENV
+  test: 
+    <<: *DEFAULT
+    branch: any
+    ssl: false
+    fqdn: test_app.hartware.fr
+  preprod: 
+    <<: *DEFAULT
+    branch: preprod
+    fqdn: preprod.hartware.fr
+  prod: &PROD
+    <<: *DEFAULT
+
+domains:
+  hartware.fr:
+    main:
+      git: test
+      connect:
+        socket_file: "/"
+      environment: 
+        <<: *ENV 
+        prod:
+          <<: *PROD
+          fqdn: hartware.fr
+
+    app:
+      git: test
+      connect:
+        socket_file: "/"
+      environment:
+        <<: *ENV
+        prod:
+          <<: *PROD
+          fqdn: app.hartware.fr
+
