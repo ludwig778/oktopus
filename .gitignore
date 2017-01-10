@@ -1,0 +1,3 @@
+# Ignore generated nginx confs
+controller/nginx_conf
+*.pyc

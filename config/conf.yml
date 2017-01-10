@@ -19,9 +19,10 @@ environment: &ENV
 domains:
   hartware.fr:
     main:
-      git: test
+      git: git clone git@bitbucket.org:ludwig778/blog.git
       connect:
-        socket_file: "/"
+        method: "sock_file"
+        arg: "/test.sock"
       environment: 
         <<: *ENV 
         prod:
@@ -29,9 +30,10 @@ domains:
           fqdn: hartware.fr
 
     app:
-      git: test
+      git: 
       connect:
-        socket_file: "/"
+        method: "sock_file"
+        arg: "/test.sock"
       environment:
         <<: *ENV
         prod:

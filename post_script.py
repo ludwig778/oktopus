@@ -1,9 +1,13 @@
 from bottle import Bottle, run, request, post
 import pprint
 import yaml
+import os
 import json
-import jinja2
+from jinja2 import Environment, FileSystemLoader
 import urllib
+
+APP_PATH = os.path.dirname(os.path.realpath(__file__))
+ENV = Environment(loader=FileSystemLoader('templates'))
 
 app = Bottle()
 
@@ -34,9 +38,15 @@ def main():
     pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
     #pp.pprint(out) 
     #print "\n\n"
+    template = ENV.get_template("base.conf")
     for domain in out['domains']:
         for app in out['domains'][domain]:
-            print app
+            args = out['domains'][domain][app]
+            args.update({"name": app})
+            output = template.render(args=args, env="prod")
+            with open("nginx_conf/%s_prod.conf" % app, "wb") as fh:
+                fh.write(output)
 
 main()
+exit()
 run(app, host='0.0.0.0', port=8080)
