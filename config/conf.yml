@@ -16,27 +16,40 @@ environment: &ENV
   prod: &PROD
     <<: *DEFAULT
 
-domains:
-  hartware.fr:
-    main:
-      git: git clone git@bitbucket.org:ludwig778/blog.git
-      connect:
-        method: "sock_file"
-        arg: "/test.sock"
-      environment: 
-        <<: *ENV 
-        prod:
-          <<: *PROD
-          fqdn: hartware.fr
+apps:
+  main:
+    name: main
+    git: git clone git@bitbucket.org:ludwig778/blog.git
+    connect:
+      method: "sock_file"
+      arg: "/test.sock"
+    environment: 
+      <<: *ENV 
+      prod:
+        <<: *PROD
+        fqdn: hartware.fr
 
-    app:
-      git: 
-      connect:
-        method: "sock_file"
-        arg: "/test.sock"
-      environment:
-        <<: *ENV
-        prod:
-          <<: *PROD
-          fqdn: app.hartware.fr
+  app:
+    name: app
+    git: 
+    connect:
+      method: "sock_file"
+      arg: "/test.sock"
+    environment:
+      <<: *ENV
+      prod:
+        <<: *PROD
+        fqdn: app.hartware.fr
+
+  fake:
+    name: fake
+    git: 
+    connect:
+      method: "port"
+      arg: 8080
+    environment:
+      <<: *ENV
+      prod:
+        <<: *PROD
+        fqdn: fake.hartware.fr
 
