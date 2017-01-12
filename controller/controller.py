@@ -54,16 +54,16 @@ class Controller:
             self.file_confs[environment] = [args['name']]
 
         #print args
-        print "{0} @ {1}/{2}".format("output", NGINX_CONF_PATH, filename)
-        print "Git clone/pull from: {0}".format(args['git'])
 
 
         repo_folder = os.path.join(BASE_REPOS_PATH, args['name'], environment)
-        print "Repo to {0}".format(repo_folder)
+        #print "{0} @ {1}/{2}".format("output", NGINX_CONF_PATH, filename)
+        #print "Git clone/pull from: {0}".format(args['git'])
+        #print "Repo to {0}".format(repo_folder)
         if False:
              
             if not os.path.exists(repo_folder):
-                Repo.clone_from(url, repo_folder)
+                Repo.clone_from(args['git'], repo_folder)
                 repo = Git(repo_folder)
             else:
                 repo = Git(repo_folder)
@@ -72,6 +72,8 @@ class Controller:
 
         
         print "docker build -t {0}:{1} {2}/{0}/{1}/".format(args['name'], environment, BASE_REPOS_PATH)
+        #self.client.images.build(path=os.path.join(BASE_REPOS_PATH, args['name'], environment),
+        #                         tag="%s:%s" % (args['name'], environment))
         #print ""
         volumes = {}
         ports = {}
@@ -82,30 +84,24 @@ class Controller:
         else:
             ports.update({'{0}/tcp'.format(args['connect']['arg']): args['connect']['arg']})
 
-        print "docker run {0}:{1}\nvolumes={2}\nports={3}".format(args['name'], environment, volumes, ports)
+
+        #self.client.containers.run(image="%s:%s" % (repo, branch),
+        #                           ports=ports,
+        #                           volumes=volumes,
+        #                           remove=True,
+        #                           name="%s:%s" % (repo, branch))
+
+        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
         print ""
 
-
-
-    def build_container(repo, branch):
-        self.client.images.build(path=os.path.join(BASE_REPOS_PATH, repo, branch), tag="%s:%s" % (repo, branch))
-    
-    def run_container(app, repo, branch):
-        ports = {}
-        volumes = {'/tmp/socket/folder/host': {}}
-        self.client.containers.run(image="%s:%s" % (repo, branch),
-                           command="nc -l -p 1111",
-                           ports=ports,
-                           volumes=volumes,
-                           remove=True,
-                           name="%s:%s" % (repo, branch))
-
-    def clean():
+    def clean(self):
         pass
 
 if True:
     t = Controller()
     t.start()
+    t.provision("fake", "test")
+    t.provision("fake", "preprod")
     print t.file_confs
 
 

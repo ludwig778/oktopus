@@ -38,14 +38,6 @@ def main():
     pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
     #pp.pprint(out) 
     #print "\n\n"
-    template = ENV.get_template("base.conf")
-    for domain in out['domains']:
-        for app in out['domains'][domain]:
-            args = out['domains'][domain][app]
-            args.update({"name": app})
-            output = template.render(args=args, env="prod")
-            with open("nginx_conf/%s_prod.conf" % app, "wb") as fh:
-                fh.write(output)
 
 main()
 exit()
