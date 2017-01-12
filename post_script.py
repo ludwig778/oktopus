@@ -5,11 +5,14 @@ import os
 import json
 from jinja2 import Environment, FileSystemLoader
 import urllib
+from controller.controller import Controller
 
 APP_PATH = os.path.dirname(os.path.realpath(__file__))
 ENV = Environment(loader=FileSystemLoader('templates'))
 
 app = Bottle()
+
+ctrl = Controller()
 
 @app.post('/hello')
 def hello():
@@ -28,17 +31,21 @@ def hello():
     print "                  user: {0}".format(user)
     print "               message: {0}".format(message)
 
+@app.get('/add/<repo>/<branch>')
+def add(repo, branch):
+    ctrl.provision(repo, branch)
+
 def main():
     print "hello"
 
-    with open("conf.yaml", "r") as fd:
-        str = fd.read()
-    out = yaml.load(str)
+    #with open("conf.yaml", "r") as fd:
+    #    str = fd.read()
+    #out = yaml.load(str)
     #print out
-    pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
+    #pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
     #pp.pprint(out) 
     #print "\n\n"
+    ctrl.start()
 
 main()
-exit()
-run(app, host='0.0.0.0', port=8080)
+run(app, host='0.0.0.0', port=8909)

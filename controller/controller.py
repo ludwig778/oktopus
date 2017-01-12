@@ -32,7 +32,11 @@ class Controller:
             self.provision(app)
 
     def provision(self, app, branch="master"):
-        args = self.datas['apps'][app]
+        try:
+            args = self.datas['apps'][app]
+        except:
+            return 0
+
         if not args['git'] and False:
             return 0
 
@@ -103,7 +107,7 @@ class Controller:
     def clean(self):
         pass
 
-if True:
+if False:
     t = Controller()
     t.start()
     t.provision("fake", "test")
