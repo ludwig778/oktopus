@@ -36,12 +36,18 @@ class Controller:
         if not args['git'] and False:
             return 0
 
+        print "Original branch: {0}".format(branch)
         if branch == 'master':
             environment = 'prod'
-        elif branch == 'preprod':
-            environment = 'preprod'
         else:
-            environment = 'test'
+            environment = 'preprod' if branch == 'preprod' else 'test'
+            try:
+                to_stop = self.file_confs[environment][0]
+                print "Stop container {0}:{1}".format(to_stop, environment)
+                self.file_confs[environment] = []
+            except:
+                pass
+
 
         filename = "{0}_{1}.conf".format(args['name'], environment)
         # output = TEMPLATE.render(args=args, env=environment)
@@ -102,6 +108,10 @@ if True:
     t.start()
     t.provision("fake", "test")
     t.provision("fake", "preprod")
+    t.provision("main", "nope")
+    t.provision("app", "okay_branch")
+    t.provision("main", "tchootchoo")
+    t.provision("main", "wtf")
     print t.file_confs
 
 
