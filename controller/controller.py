@@ -27,45 +27,26 @@ class Controller:
 
         self.client = docker.from_env()
     
-    def start(self, environment="prod"):
+    def start(self):
         for app in self.datas['apps']:
-            #print args
-            # WRAPPER PROVISIONNING
-            self.provision(app, environment)
-            # IF OK RUN CONTAINER
+            self.provision(app)
 
-    def get_latest_code(url, repo, branch):
-        print url, repo, branch
-        checkout_to = branch
-        if False:
-            if branch not in ["master", "preprod"]:
-                branch = "test"
-            repo_folder = os.path.join(BASE_REPOS_PATH, repo, branch)
-             
-            if not os.path.exists(repo_folder):
-                Repo.clone_from(url, repo_folder)
-                repo = Git(repo_folder)
-            else:
-                repo = Git(repo_folder)
-                repo.pull()
-            repo.checkout(checkout_to)
-    
-    def provision(self, app, environment):
+    def provision(self, app, branch="master"):
         args = self.datas['apps'][app]
         if not args['git'] and False:
             return 0
 
-        if environment == "prod":
-            branch = "master"
-        elif environment == "preprod":
-            branch = "preprod"
+        if branch == 'master':
+            environment = 'prod'
+        elif branch == 'preprod':
+            environment = 'preprod'
         else:
-            branch = "any"
+            environment = 'test'
 
-        #output = TEMPLATE.render(args=args, env=environment)
         filename = "{0}_{1}.conf".format(args['name'], environment)
-        #with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
-        #    fh.write(output)
+        # output = TEMPLATE.render(args=args, env=environment)
+        # with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
+        #     fh.write(output)
 
         try:
             self.file_confs[environment].append(args['name'])
@@ -75,6 +56,21 @@ class Controller:
         #print args
         print "{0} @ {1}/{2}".format("output", NGINX_CONF_PATH, filename)
         print "Git clone/pull from: {0}".format(args['git'])
+
+
+        repo_folder = os.path.join(BASE_REPOS_PATH, args['name'], environment)
+        print "Repo to {0}".format(repo_folder)
+        if False:
+             
+            if not os.path.exists(repo_folder):
+                Repo.clone_from(url, repo_folder)
+                repo = Git(repo_folder)
+            else:
+                repo = Git(repo_folder)
+                repo.pull()
+            repo.checkout(branch)
+
+        
         print "docker build -t {0}:{1} {2}/{0}/{1}/".format(args['name'], environment, BASE_REPOS_PATH)
         #print ""
         volumes = {}
