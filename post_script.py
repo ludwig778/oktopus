@@ -22,11 +22,19 @@ def hello():
     #jsonObj = json.loads(parsedBody)
     jsonObj = json.loads(body)
     print jsonObj
-    push_info = jsonObj['push']['changes'][0]['new']
-    branch = push_info['name']
-    message = push_info['target']['message']
-    user = push_info['target']['author']['raw']
-    repo = jsonObj['repository']['name']
+
+    repo = "gogs"
+    if repo == "bitbucket":
+        push_info = jsonObj['push']['changes'][0]['new']
+        branch = push_info['name']
+        message = push_info['target']['message']
+        user = push_info['target']['author']['raw']
+        repo = jsonObj['repository']['name']
+    elif repo == "gogs":
+        branch = jsonObj['ref'].split('/')[-1]
+        repo = jsonObj['repository']['name']
+        user = jsonObj['commits'][0]['committer']['name']
+        message = jsonObj['commits'][0]['message']
     print "Webhook received, repo: {0} : branch {1}".format(repo, branch)
     print "                  user: {0}".format(user)
     print "               message: {0}".format(message)
