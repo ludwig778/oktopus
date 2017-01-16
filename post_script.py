@@ -54,4 +54,10 @@ def main():
     ctrl.start()
 
 main()
-run(app, host='0.0.0.0', port=8909)
+try:
+    run(app, host='0.0.0.0', port=8909)
+except KeyboardInterrupt:
+    ctrl.clean()
+except Exception, e:
+    print "Unexpected error"
+    print e

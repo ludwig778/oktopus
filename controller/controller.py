@@ -1,6 +1,7 @@
 import os
 import docker
 import json
+from time import sleep
 from git import Repo, Git
 import yaml
 from jinja2 import Environment, FileSystemLoader
@@ -30,10 +31,30 @@ class Controller:
             exit()
 
         self.client = docker.from_env()
+      
+    def cleanup(self, name):  
+        for i in range(0, 3):
+            sleep(0.3)
+            try:
+                container = self.client.containers.get(name)
+                print "container flushing: " + container.name
+                container.stop()
+                container.remove()
+                print "Flushing done"
+            except docker.errors.NotFound:
+                break
+            except Exception, e:
+                print "ERROR"
+                print e
+                if i == 2:
+                    print "Too much error, quiting..."
+                    exit(1)
 
     def start(self):
         for app in self.datas['apps']:
             self.provision(app)
+
+        self.cleanup("mynginx")
 
         print "Creating nginx container"
         nginx = self.client.containers.create(image="nginx",
@@ -50,9 +71,10 @@ class Controller:
         self.client.networks.get("my_bridge").connect("mynginx")
         nginx.start()
 
-        #for i in self.client.images.list():
-        #    if not i.tags:
-        #        self.client.images.remove(i)
+        print "Cleaning...."
+        for i in self.client.images.list():
+            if not i.tags:
+                self.client.images.remove(i.attrs)
         print "Done"
 
     def provision(self, app, branch="master"):
@@ -75,19 +97,15 @@ class Controller:
             except:
                 pass
 
-        print args
+#        print args
         filename = "{0}_{1}.conf".format(args['name'], environment)
-        try:
-            container = self.client.containers.get("{0}_{1}".format(args['name'], environment))
-            container.stop()
-        except:
-            pass
+        self.cleanup("{0}_{1}".format(args['name'], environment))
 
         output = TEMPLATE.render(args=args, env=environment)
         with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
             fh.write(output)
-        print filename
-        print output
+#        print filename
+#        print output
         try:
             self.file_confs[environment].append(args['name'])
         except:
@@ -132,17 +150,19 @@ class Controller:
 
 #        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
 #        print "brannchhhh" + branch
-        self.client.containers.run(image="%s_%s" % (args['name'], environment),
+        container = self.client.containers.create(image="%s_%s" % (args['name'], environment),
                                    ports=ports,
                                    volumes=volumes,
                                    detach=True,
                                    name="%s_%s" % (args['name'], environment),
                                    hostname="%s-%s" % (args['name'], environment))
         self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
+        container.start()
 #        print ""
 
     def clean(self):
         pass
+        
 
 if False:
     t = Controller()
