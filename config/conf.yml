@@ -4,12 +4,12 @@ default: &DEFAULT
   scale: 1
 
 environment: &ENV
-  test: 
+  test:
     <<: *DEFAULT
     branch: any
     ssl: false
     fqdn: test_app.hartware.fr
-  preprod: 
+  preprod:
     <<: *DEFAULT
     branch: preprod
     fqdn: preprod.hartware.fr
@@ -17,39 +17,40 @@ environment: &ENV
     <<: *DEFAULT
 
 apps:
-  main:
-    name: main
-    git: git clone git@bitbucket.org:ludwig778/blog.git
+  blog:
+    name: blog
+    git: git@bitbucket.org:ludwig778/blog.git
     connect:
       method: "sock_file"
-      arg: "/test.sock"
-    environment: 
-      <<: *ENV 
+      arg: "/blog/tmp/socket"
+      name: "unicorn.sock"
+    environment:
+      <<: *ENV
       prod:
         <<: *PROD
         fqdn: hartware.fr
 
-  app:
-    name: app
-    git: 
+  django:
+    name: django
+    git: git@github.com:ludwig778/django-demo.git
     connect:
       method: "sock_file"
-      arg: "/test.sock"
+      arg: "/app/socket"
+      name: "gunicorn.sock"
     environment:
       <<: *ENV
       prod:
         <<: *PROD
         fqdn: app.hartware.fr
 
-  fake:
-    name: fake
-    git: 
+  netcat:
+    name: netcat
+    git: git@github.com:ludwig778/netcat_demo.git
     connect:
       method: "port"
-      arg: 8080
+      arg: 8090
     environment:
       <<: *ENV
       prod:
         <<: *PROD
-        fqdn: fake.hartware.fr
-
+        fqdn: nc.hartware.fr

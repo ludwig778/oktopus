@@ -1,6 +1,7 @@
 import os
 import docker
-from git import Repo
+import json
+from git import Repo, Git
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
@@ -11,8 +12,11 @@ TEMPLATE = ENV.get_template("base.conf")
 
 CONFIG = os.path.abspath(os.path.join(APP_PATH, "config", "conf.yml"))
 
-NGINX_CONF_PATH = os.path.abspath(os.path.join(APP_PATH, "controller", "nginx_conf"))
-BASE_REPOS_PATH = os.path.abspath(os.path.join("/", "var", "opt", "git_repos"))
+PARENT_DIR_PATH = os.path.abspath('..')
+BASE_REPOS_PATH = os.path.join(PARENT_DIR_PATH, "git_repos")
+BASE_SOCKETS_PATH = os.path.join(PARENT_DIR_PATH, "socket_storage")
+NGINX_CONF_PATH = os.path.join(PARENT_DIR_PATH, "nginx_conf")
+
 
 class Controller:
 
@@ -26,10 +30,25 @@ class Controller:
             exit()
 
         self.client = docker.from_env()
-    
+
     def start(self):
         for app in self.datas['apps']:
             self.provision(app)
+
+        print "Creating nginx container"
+        self.client.containers.run(image="nginx",
+                                   ports={'80/tcp': 80},
+                                   volumes={NGINX_CONF_PATH:
+                                                   {'bind': "/etc/nginx/conf.d",
+                                                    'mode': 'rw'},
+                                            BASE_SOCKETS_PATH:
+                                                   {'bind': "/sockets",
+                                                    'mode': 'rw'}},
+                                   detach=True,
+                                   name="mynginx",
+                                   hostname="mynginx")
+        self.client.networks.get("my_bridge").connect("mynginx")
+        print "Done"
 
     def provision(self, app, branch="master"):
         try:
@@ -40,7 +59,6 @@ class Controller:
         if not args['git'] and False:
             return 0
 
-        print "Original branch: {0}".format(branch)
         if branch == 'master':
             environment = 'prod'
         else:
@@ -52,57 +70,65 @@ class Controller:
             except:
                 pass
 
-
+        print args
         filename = "{0}_{1}.conf".format(args['name'], environment)
-        # output = TEMPLATE.render(args=args, env=environment)
-        # with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
-        #     fh.write(output)
-
+        output = TEMPLATE.render(args=args, env=environment)
+        with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
+            fh.write(output)
+        print filename
+        print output
         try:
             self.file_confs[environment].append(args['name'])
         except:
             self.file_confs[environment] = [args['name']]
 
-        #print args
-
-
         repo_folder = os.path.join(BASE_REPOS_PATH, args['name'], environment)
         #print "{0} @ {1}/{2}".format("output", NGINX_CONF_PATH, filename)
         #print "Git clone/pull from: {0}".format(args['git'])
         #print "Repo to {0}".format(repo_folder)
-        if False:
-             
+        if True:
             if not os.path.exists(repo_folder):
+#                print "Trying to get repo: " + app
                 Repo.clone_from(args['git'], repo_folder)
+#                print "Clone repo done: " + app
                 repo = Git(repo_folder)
             else:
+#                print "Trying to pull repo: " + app
                 repo = Git(repo_folder)
+#                print "Pull repo done: " + app
                 repo.pull()
             repo.checkout(branch)
 
-        
-        print "docker build -t {0}:{1} {2}/{0}/{1}/".format(args['name'], environment, BASE_REPOS_PATH)
-        #self.client.images.build(path=os.path.join(BASE_REPOS_PATH, args['name'], environment),
-        #                         tag="%s:%s" % (args['name'], environment))
-        #print ""
+#        print "docker build -t {0}:{1} {2}/{0}/{1}/".format(args['name'], environment, BASE_REPOS_PATH)
+        tt = self.client.images.build(path=os.path.join(BASE_REPOS_PATH, args['name'], environment),
+                          tag="%s_%s" % (args['name'], environment),
+                          stream=True,
+                          rm=True,
+                          forcerm=True)
+
+#        print "Already build"
         volumes = {}
         ports = {}
         if args['connect']['method'] == "sock_file":
-            volumes.update({'/var/host/sockets_storage/{0}/{1}/'.format(args['name'], environment):
+            socket_folder = BASE_SOCKETS_PATH + '/{0}/{1}/'.format(args['name'], environment)
+            if not os.path.exists(socket_folder):
+                os.makedirs(socket_folder)
+            volumes.update({socket_folder:
                             {'bind': args['connect']['arg'],
-                             'mode': 'ro'}})
+                             'mode': 'rw'}})
         else:
             ports.update({'{0}/tcp'.format(args['connect']['arg']): args['connect']['arg']})
 
-
-        #self.client.containers.run(image="%s:%s" % (repo, branch),
-        #                           ports=ports,
-        #                           volumes=volumes,
-        #                           remove=True,
-        #                           name="%s:%s" % (repo, branch))
-
-        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
-        print ""
+#        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
+#        print "brannchhhh" + branch
+        self.client.containers.run(image="%s_%s" % (args['name'], environment),
+                                   ports=ports,
+                                   volumes=volumes,
+                                   detach=True,
+                                   name="%s_%s" % (args['name'], environment),
+                                   hostname="%s-%s" % (args['name'], environment))
+        self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
+#        print ""
 
     def clean(self):
         pass
@@ -117,6 +143,3 @@ if False:
     t.provision("main", "tchootchoo")
     t.provision("main", "wtf")
     print t.file_confs
-
-
-

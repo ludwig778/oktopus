@@ -44,14 +44,12 @@ def add(repo, branch):
     ctrl.provision(repo, branch)
 
 def main():
-    print "hello"
-
     #with open("conf.yaml", "r") as fd:
     #    str = fd.read()
     #out = yaml.load(str)
     #print out
     #pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
-    #pp.pprint(out) 
+    #pp.pprint(out)
     #print "\n\n"
     ctrl.start()
 
