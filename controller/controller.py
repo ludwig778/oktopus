@@ -36,7 +36,7 @@ class Controller:
             self.provision(app)
 
         print "Creating nginx container"
-        self.client.containers.run(image="nginx",
+        nginx = self.client.containers.create(image="nginx",
                                    ports={'80/tcp': 80},
                                    volumes={NGINX_CONF_PATH:
                                                    {'bind': "/etc/nginx/conf.d",
@@ -48,6 +48,11 @@ class Controller:
                                    name="mynginx",
                                    hostname="mynginx")
         self.client.networks.get("my_bridge").connect("mynginx")
+        nginx.start()
+
+        #for i in self.client.images.list():
+        #    if not i.tags:
+        #        self.client.images.remove(i)
         print "Done"
 
     def provision(self, app, branch="master"):
@@ -72,6 +77,12 @@ class Controller:
 
         print args
         filename = "{0}_{1}.conf".format(args['name'], environment)
+        try:
+            container = self.client.containers.get("{0}_{1}".format(args['name'], environment))
+            container.stop()
+        except:
+            pass
+
         output = TEMPLATE.render(args=args, env=environment)
         with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
             fh.write(output)
