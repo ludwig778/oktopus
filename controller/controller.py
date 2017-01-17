@@ -105,7 +105,7 @@ class Controller:
                 port += 1
             elif environment == 'test':
                 port += 2
-            print "Port used is " + port 
+            print "Port used is " + str(port) 
         else:
             port = ""
 #        print args
