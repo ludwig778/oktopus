@@ -182,18 +182,18 @@ class Controller:
             branch = push_info['name']
             message = push_info['target']['message']
             user = push_info['target']['author']['raw']
-            repo = webhook['repository']['name']
+            repo2 = webhook['repository']['name']
         elif webhook_type == "gogs":
             branch = webhook['ref'].split('/')[-1]
-            repo = webhook['repository']['name']
+            repo2 = webhook['repository']['name']
             user = webhook['commits'][0]['committer']['name']
             message = webhook['commits'][0]['message']
         elif webhook_type == "github":
             branch = webhook['ref'].split('/')[-1]
-            repo = webhook['repository']['name']
+            repo2 = webhook['repository']['name']
             user = webhook['pusher']['name']
             message = webhook['head_commit']['message']
-        print "Webhook received, repo: {0} : branch {1}".format(repo, branch)
+        print "Webhook received, repo: {0} : branch {1}".format(repo2, branch)
         print "                  user: {0}".format(user)
         print "               message: {0}".format(message)
         self.provision(repo, branch)
