@@ -168,7 +168,7 @@ class Controller:
         print "good 2"
         datas = ""
         for i in self.datas['apps']:
-            if self.datas['apps'][i]['git']['name'] == repo:
+            if self.datas['apps'][i]['name'] == repo:
                 datas = self.datas['apps'][i]
 
         if not datas:
