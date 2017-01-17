@@ -157,7 +157,7 @@ class Controller:
                             {'bind': args['connect']['arg'],
                              'mode': 'rw'}})
         else:
-            ports.update({'{0}/tcp'.format(port): args['connect']['arg']})
+            ports.update({'{0}/tcp'.format(port): port})
 
 #        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
 #        print "brannchhhh" + branch
