@@ -36,7 +36,7 @@ apps:
     name: django
     git: 
       url: git@github.com:ludwig778/django-demo.git
-      type: bitbucket
+      type: github
     connect:
       method: "sock_file"
       arg: "/app/socket"
@@ -51,7 +51,7 @@ apps:
     name: netcat
     git: 
       url: git@github.com:ludwig778/netcat_demo.git
-      type: bitbucket
+      type: github
     connect:
       method: "port"
       arg: 8090
