@@ -51,6 +51,11 @@ class Controller:
                     exit(1)
 
     def start(self):
+        print "Erasing previous nginx confs..."
+        fileList = os.listdir(NGINX_CONF_PATH)
+        for fileName in fileList:
+            os.remove(NGINX_CONF_PATH+"/"+fileName)
+
         for app in self.datas['apps']:
             self.provision(app)
 
