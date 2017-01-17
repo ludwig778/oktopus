@@ -196,6 +196,7 @@ class Controller:
         print "Webhook received, repo: {0} : branch {1}".format(repo, branch)
         print "                  user: {0}".format(user)
         print "               message: {0}".format(message)
+        provision(repo, branch)
         
 
 if False:
