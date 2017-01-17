@@ -98,11 +98,16 @@ class Controller:
             except:
                 pass
 
+        port = args['connect']['arg']
+        if environment == 'preprod':
+            port += 1
+        elif environment == 'test':
+            port += 2 
 #        print args
         filename = "{0}_{1}.conf".format(args['name'], environment)
         self.cleanup("{0}_{1}".format(args['name'], environment))
 
-        output = TEMPLATE.render(args=args, env=environment)
+        output = TEMPLATE.render(args=args, env=environment, port=port)
         with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
             fh.write(output)
 #        print filename
@@ -147,7 +152,7 @@ class Controller:
                             {'bind': args['connect']['arg'],
                              'mode': 'rw'}})
         else:
-            ports.update({'{0}/tcp'.format(args['connect']['arg']): args['connect']['arg']})
+            ports.update({'{0}/tcp'.format(port): args['connect']['arg']})
 
 #        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
 #        print "brannchhhh" + branch
