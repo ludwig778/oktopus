@@ -24,7 +24,7 @@ class Controller:
     file_confs = {}
     def __init__(self):
         with open(CONFIG, "r") as fd:
-            self.port_mapping = 8000
+            self.port_mapping = 8090
             self.datas = yaml.load(fd.read())
 
         if not self.datas:
