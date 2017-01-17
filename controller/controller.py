@@ -99,7 +99,7 @@ class Controller:
                 pass
 
 
-        if args['connect']['method'] == "sock_file":
+        if args['connect']['method'] == "port":
             port = args['connect']['arg']
             if environment == 'preprod':
                 port += 1
