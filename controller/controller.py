@@ -84,6 +84,7 @@ class Controller:
                                    name="mynginx",
                                    hostname="mynginx")
         self.client.networks.get("my_bridge").connect("mynginx")
+        self.client.networks.get("bridge").disconnect("mynginx")
         nginx.start()
 
     def provision(self, app, branch="master"):
@@ -167,6 +168,7 @@ class Controller:
                                    name="%s_%s" % (args['name'], environment),
                                    hostname="%s-%s" % (args['name'], environment))
         self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
+        self.client.networks.get("bridge").disconnect("%s_%s" % (args['name'], environment))
         container.start()
 
         if args['connect']['method'] == "port":
