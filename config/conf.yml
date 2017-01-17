@@ -30,7 +30,7 @@ apps:
       <<: *ENV
       prod:
         <<: *PROD
-        fqdn: hartware.fr
+        fqdn: blog.hartware.fr
 
   django:
     name: django
