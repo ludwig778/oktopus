@@ -8,7 +8,7 @@ environment: &ENV
     <<: *DEFAULT
     branch: any
     ssl: false
-    fqdn: test_app.hartware.fr
+    fqdn: testing.hartware.fr
   preprod:
     <<: *DEFAULT
     branch: preprod
@@ -59,4 +59,4 @@ apps:
       <<: *ENV
       prod:
         <<: *PROD
-        fqdn: testing.hartware.fr
+        fqdn: nc.hartware.fr
