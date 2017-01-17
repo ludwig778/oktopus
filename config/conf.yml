@@ -22,6 +22,7 @@ apps:
     git: 
       url: git@bitbucket.org:ludwig778/blog.git
       type: bitbucket
+      name: blog
     connect:
       method: "sock_file"
       arg: "/blog/tmp/socket"
@@ -37,6 +38,7 @@ apps:
     git: 
       url: git@github.com:ludwig778/django-demo.git
       type: github
+      name: django-demo
     connect:
       method: "sock_file"
       arg: "/app/socket"

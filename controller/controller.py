@@ -172,7 +172,7 @@ class Controller:
                 datas = self.datas['apps'][i]
 
         if not datas:
-            print "Not a valid webhook name"
+            print "Not a valid webhook name" + repo
             return False
 
         webhook_type = datas['git']['type']
