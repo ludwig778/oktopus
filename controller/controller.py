@@ -24,6 +24,7 @@ class Controller:
     file_confs = {}
     def __init__(self):
         with open(CONFIG, "r") as fd:
+            self.port_mapping = 15000
             self.datas = yaml.load(fd.read())
 
         if not self.datas:
@@ -106,21 +107,11 @@ class Controller:
             except:
                 pass
 
-
-        if args['connect']['method'] == "port":
-            port = args['connect']['arg']
-            if environment == 'preprod':
-                port += 1
-            elif environment == 'test':
-                port += 2
-            print "Port used is " + str(port) 
-        else:
-            port = ""
 #        print args
         filename = "{0}_{1}.conf".format(args['name'], environment)
         self.cleanup("{0}_{1}".format(args['name'], environment))
 
-        output = TEMPLATE.render(args=args, env=environment, port=port)
+        output = TEMPLATE.render(args=args, env=environment, port=self.port_mapping)
         with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
             fh.write(output)
 #        print filename
@@ -165,7 +156,7 @@ class Controller:
                             {'bind': args['connect']['arg'],
                              'mode': 'rw'}})
         else:
-            ports.update({'{0}/tcp'.format(port): port})
+            ports.update({'{0}/tcp'.format(args['connect']['arg']): self.port_mapping})
 
 #        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
 #        print "brannchhhh" + branch
@@ -177,6 +168,9 @@ class Controller:
                                    hostname="%s-%s" % (args['name'], environment))
         self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
         container.start()
+
+        if args['connect']['method'] == "port":
+            self.port_mapping += 1
 #        print ""
 
     def clean(self):
