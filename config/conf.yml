@@ -52,6 +52,7 @@ apps:
     git: 
       url: git@github.com:ludwig778/netcat_demo.git
       type: github
+      name: netcat_demo
     connect:
       method: "port"
       arg: 8090

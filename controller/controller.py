@@ -51,7 +51,6 @@ class Controller:
                     exit(1)
 
     def start(self):
-        return
         for app in self.datas['apps']:
             self.provision(app)
 
@@ -79,6 +78,7 @@ class Controller:
         print "Done"
 
     def provision(self, app, branch="master"):
+        print "Provisioning " + app + " @ branch " + branch
         try:
             args = self.datas['apps'][app]
         except:
@@ -196,16 +196,4 @@ class Controller:
         print "Webhook received, repo: {0} : branch {1}".format(repo, branch)
         print "                  user: {0}".format(user)
         print "               message: {0}".format(message)
-        provision(repo, branch)
-        
-
-if False:
-    t = Controller()
-    t.start()
-    t.provision("fake", "test")
-    t.provision("fake", "preprod")
-    t.provision("main", "nope")
-    t.provision("app", "okay_branch")
-    t.provision("main", "tchootchoo")
-    t.provision("main", "wtf")
-    print t.file_confs
+        self.provision(repo, branch)
