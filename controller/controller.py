@@ -188,6 +188,11 @@ class Controller:
             repo = webhook['repository']['name']
             user = webhook['commits'][0]['committer']['name']
             message = webhook['commits'][0]['message']
+        elif webhook_type == "github":
+            branch = webhook['ref'].split('/')[-1]
+            repo = webhook['repository']['name']
+            user = webhook['pusher']['name']
+            message = webhook['head_commit']['message']
         print "Webhook received, repo: {0} : branch {1}".format(repo, branch)
         print "                  user: {0}".format(user)
         print "               message: {0}".format(message)

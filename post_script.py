@@ -16,14 +16,16 @@ ctrl = Controller()
 
 @app.post('/hello/<repo>')
 def hello(repo):
-    #body = request.body.read()
-    #jsonObj = json.loads(body)
+    body = request.body.read()
+    jsonObj = json.loads(body)
 
+    pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
+    pp.pprint(jsonObj)
 
     #body = body.replace("+","").replace("payload=","")
     #parsedBody = urllib.unquote(body).decode('utf8')
     #jsonObj = json.loads(parsedBody)
-    ctrl.preprovision(repo, "test")
+    ctrl.preprovision(repo, jsonObj)
 
 @app.get('/add/<repo>/<branch>')
 def add(repo, branch):
