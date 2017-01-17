@@ -98,11 +98,16 @@ class Controller:
             except:
                 pass
 
-        port = args['connect']['arg']
-        if environment == 'preprod':
-            port += 1
-        elif environment == 'test':
-            port += 2 
+
+        if args['connect']['method'] == "sock_file":
+            port = args['connect']['arg']
+            if environment == 'preprod':
+                port += 1
+            elif environment == 'test':
+                port += 2
+            print "Port used is " + port 
+        else:
+            port = ""
 #        print args
         filename = "{0}_{1}.conf".format(args['name'], environment)
         self.cleanup("{0}_{1}".format(args['name'], environment))
