@@ -51,6 +51,7 @@ class Controller:
                     exit(1)
 
     def start(self):
+        return
         for app in self.datas['apps']:
             self.provision(app)
 
@@ -83,7 +84,7 @@ class Controller:
         except:
             return 0
 
-        if not args['git'] and False:
+        if not args['git']['url'] and False:
             return 0
 
         if branch == 'master':
@@ -118,7 +119,7 @@ class Controller:
         if True:
             if not os.path.exists(repo_folder):
 #                print "Trying to get repo: " + app
-                Repo.clone_from(args['git'], repo_folder)
+                Repo.clone_from(args['git']['url'], repo_folder)
 #                print "Clone repo done: " + app
                 repo = Git(repo_folder)
             else:
@@ -162,6 +163,34 @@ class Controller:
 
     def clean(self):
         pass
+
+    def preprovision(self, repo, webhook):
+        print "good 2"
+        datas = ""
+        for i in self.datas['apps']:
+            if self.datas['apps'][i]['name'] == repo:
+                datas = self.datas['apps'][i]
+
+        if not datas:
+            print "Not a valid webhook name"
+            return False
+
+        webhook_type = datas['git']['type']
+        print webhook_type
+        if webhook_type == "bitbucket":
+            push_info = webhook['push']['changes'][0]['new']
+            branch = push_info['name']
+            message = push_info['target']['message']
+            user = push_info['target']['author']['raw']
+            repo = webhook['repository']['name']
+        elif webhook_type == "gogs":
+            branch = webhook['ref'].split('/')[-1]
+            repo = webhook['repository']['name']
+            user = webhook['commits'][0]['committer']['name']
+            message = webhook['commits'][0]['message']
+        print "Webhook received, repo: {0} : branch {1}".format(repo, branch)
+        print "                  user: {0}".format(user)
+        print "               message: {0}".format(message)
         
 
 if False:
