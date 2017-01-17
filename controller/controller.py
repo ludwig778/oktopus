@@ -54,6 +54,15 @@ class Controller:
         for app in self.datas['apps']:
             self.provision(app)
 
+        self.restart_nginx()
+
+        print "Cleaning...."
+        for i in self.client.images.list():
+            if not i.tags:
+                self.client.images.remove(i.attrs)
+        print "Done"
+
+    def restart_nginx(self):
         self.cleanup("mynginx")
 
         print "Creating nginx container"
@@ -70,12 +79,6 @@ class Controller:
                                    hostname="mynginx")
         self.client.networks.get("my_bridge").connect("mynginx")
         nginx.start()
-
-        print "Cleaning...."
-        for i in self.client.images.list():
-            if not i.tags:
-                self.client.images.remove(i.attrs)
-        print "Done"
 
     def provision(self, app, branch="master"):
         print "Provisioning " + app + " @ branch " + branch
@@ -207,3 +210,4 @@ class Controller:
         print "                  user: {0}".format(user)
         print "               message: {0}".format(message)
         self.provision(repo, branch)
+        self.restart_nginx()
