@@ -16,7 +16,7 @@ CONFIG = os.path.abspath(os.path.join(APP_PATH, "config", "conf.yml"))
 PARENT_DIR_PATH = os.path.abspath('..')
 BASE_REPOS_PATH = os.path.join(PARENT_DIR_PATH, "git_repos")
 BASE_SOCKETS_PATH = os.path.join(PARENT_DIR_PATH, "socket_storage")
-NGINX_CONF_PATH = os.path.join(PARENT_DIR_PATH, "nginx_conf")
+NGINX_CONF_PATH = os.path.join(PARENT_DIR_PATHF, "nginx_conf")
 
 
 class Controller:
@@ -24,7 +24,6 @@ class Controller:
     file_confs = {}
     def __init__(self):
         with open(CONFIG, "r") as fd:
-            self.port_mapping = 8089
             self.datas = yaml.load(fd.read())
 
         if not self.datas:
@@ -83,8 +82,8 @@ class Controller:
                                    detach=True,
                                    name="mynginx",
                                    hostname="mynginx")
-        #self.client.networks.get("my_bridge").connect("mynginx")
-        #self.client.networks.get("bridge").disconnect("mynginx")
+        self.client.networks.get("my_bridge").connect("mynginx")
+        self.client.networks.get("bridge").disconnect("mynginx")
         nginx.start()
 
     def provision(self, app, branch="master"):
@@ -112,7 +111,7 @@ class Controller:
         filename = "{0}_{1}.conf".format(args['name'], environment)
         self.cleanup("{0}_{1}".format(args['name'], environment))
 
-        output = TEMPLATE.render(args=args, env=environment, port=self.port_mapping)
+        output = TEMPLATE.render(args=args, env=environment)
         with open(NGINX_CONF_PATH + "/" + filename, "wb") as fh:
             fh.write(output)
 #        print filename
@@ -156,8 +155,8 @@ class Controller:
             volumes.update({socket_folder:
                             {'bind': args['connect']['arg'],
                              'mode': 'rw'}})
-        else:
-            ports.update({'{0}/tcp'.format(args['connect']['arg']): self.port_mapping})
+        #else:
+        #    ports.update({'{0}/tcp'.format(args['connect']['arg']): self.port_mapping})
 
 #        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
 #        print "brannchhhh" + branch
@@ -167,12 +166,10 @@ class Controller:
                                    detach=True,
                                    name="%s_%s" % (args['name'], environment),
                                    hostname="%s-%s" % (args['name'], environment))
-        #self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
-        #self.client.networks.get("bridge").disconnect("%s_%s" % (args['name'], environment))
+        self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
+        self.client.networks.get("bridge").disconnect("%s_%s" % (args['name'], environment))
         container.start()
 
-        if args['connect']['method'] == "port":
-            self.port_mapping += 1
 #        print ""
 
     def clean(self):
