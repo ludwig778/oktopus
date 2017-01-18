@@ -15,8 +15,8 @@ ctrl = Controller()
 def hello(repo):
     body = request.body.read()
     jsonObj = json.loads(body)
-    #pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
-    #pp.pprint(jsonObj)
+    pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
+    pp.pprint(jsonObj)
     ctrl.preprovision(repo, jsonObj)
 
 @app.get('/add/<repo>/<branch>')
