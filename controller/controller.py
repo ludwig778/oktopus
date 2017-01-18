@@ -59,7 +59,7 @@ class Controller:
         for app in self.datas['apps']:
             self.provision(app)
 
-        self.restart_nginx()
+        self.start_nginx()
 
         print "Cleaning...."
         for i in self.client.images.list():
@@ -67,7 +67,7 @@ class Controller:
                 self.client.images.remove(i.attrs)
         print "Done"
 
-    def restart_nginx(self):
+    def start_nginx(self):
         self.cleanup("mynginx")
 
         print "Creating nginx container"
@@ -85,6 +85,11 @@ class Controller:
         self.client.networks.get("my_bridge").connect("mynginx")
         self.client.networks.get("bridge").disconnect("mynginx")
         nginx.start()
+    
+    def restart_nginx(self):
+        print "Creating nginx container"
+        nginx = self.client.containers.get("mynginx")
+        nginx.restart()
 
     def provision(self, app, branch="master"):
         print "Provisioning " + app + " @ branch " + branch
@@ -155,11 +160,7 @@ class Controller:
             volumes.update({socket_folder:
                             {'bind': args['connect']['arg'],
                              'mode': 'rw'}})
-        #else:
-        #    ports.update({'{0}/tcp'.format(args['connect']['arg']): self.port_mapping})
-
-#        print "docker run -rm\n--volumes={2}\n--ports={3}\n--name={0}:{1}\n {0}:{1}".format(args['name'], environment, volumes, ports)
-#        print "brannchhhh" + branch
+                             
         container = self.client.containers.create(image="%s_%s" % (args['name'], environment),
                                    ports=ports,
                                    volumes=volumes,
@@ -170,13 +171,10 @@ class Controller:
         self.client.networks.get("bridge").disconnect("%s_%s" % (args['name'], environment))
         container.start()
 
-#        print ""
-
     def clean(self):
         pass
 
     def preprovision(self, repo, webhook):
-        print "good 2"
         datas = ""
         for i in self.datas['apps']:
             if self.datas['apps'][i]['name'] == repo:
@@ -187,7 +185,6 @@ class Controller:
             return False
 
         webhook_type = datas['git']['type']
-        print webhook_type
         if webhook_type == "bitbucket":
             push_info = webhook['push']['changes'][0]['new']
             branch = push_info['name']

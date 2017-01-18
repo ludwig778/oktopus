@@ -7,9 +7,6 @@ from jinja2 import Environment, FileSystemLoader
 import urllib
 from controller.controller import Controller
 
-APP_PATH = os.path.dirname(os.path.realpath(__file__))
-ENV = Environment(loader=FileSystemLoader('templates'))
-
 app = Bottle()
 
 ctrl = Controller()
@@ -18,13 +15,8 @@ ctrl = Controller()
 def hello(repo):
     body = request.body.read()
     jsonObj = json.loads(body)
-
-    pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
-    pp.pprint(jsonObj)
-
-    #body = body.replace("+","").replace("payload=","")
-    #parsedBody = urllib.unquote(body).decode('utf8')
-    #jsonObj = json.loads(parsedBody)
+    #pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
+    #pp.pprint(jsonObj)
     ctrl.preprovision(repo, jsonObj)
 
 @app.get('/add/<repo>/<branch>')
@@ -32,13 +24,6 @@ def add(repo, branch):
     ctrl.provision(repo, branch)
 
 def main():
-    #with open("conf.yaml", "r") as fd:
-    #    str = fd.read()
-    #out = yaml.load(str)
-    #print out
-    #pp = pprint.PrettyPrinter(indent=1, width=80, depth=None, stream=None)
-    #pp.pprint(out)
-    #print "\n\n"
     ctrl.start()
 
 main()
