@@ -16,7 +16,7 @@ CONFIG = os.path.abspath(os.path.join(APP_PATH, "config", "conf.yml"))
 PARENT_DIR_PATH = os.path.abspath('..')
 BASE_REPOS_PATH = os.path.join(PARENT_DIR_PATH, "git_repos")
 BASE_SOCKETS_PATH = os.path.join(PARENT_DIR_PATH, "socket_storage")
-NGINX_CONF_PATH = os.path.join(PARENT_DIR_PATHF, "nginx_conf")
+NGINX_CONF_PATH = os.path.join(PARENT_DIR_PATH, "nginx_conf")
 
 
 class Controller:
