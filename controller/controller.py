@@ -35,15 +35,13 @@ class Controller:
       
     def cleanup(self, name):  
         print "Cleanup " + name
-        try:
-            container = self.client.containers.get(name)
-        except docker.errors.NotFound:
-            return
-        print "container flushing: " + container.name
         for i in range(0, 3):
             try:
+                container = self.client.containers.get(name)
                 container.stop()
                 container.remove()
+            except docker.errors.NotFound:
+                break
             except requests.exceptions.ReadTimeout:
                 print "osef"
             except Exception, e:
