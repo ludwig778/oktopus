@@ -32,6 +32,7 @@ main()
 try:
     run(app, host='0.0.0.0', port=8909)
 except KeyboardInterrupt:
+    print "Keyboard escape"
     ctrl.clean_all()
 except Exception, e:
     print "Unexpected error"
