@@ -33,8 +33,8 @@ class Controller:
         self.client = docker.from_env()
       
     def cleanup(self, name):  
+        print "Cleanup " + name
         for i in range(0, 3):
-            sleep(0.3)
             try:
                 container = self.client.containers.get(name)
                 print "container flushing: " + container.name
@@ -61,6 +61,10 @@ class Controller:
 
         self.start_nginx()
 
+        output = ENV.get_template("default.conf").render()
+        with open(NGINX_CONF_PATH + "/default.conf", "wb") as fh:
+            fh.write(output)
+
         print "Cleaning...."
         for i in self.client.images.list():
             if not i.tags:
@@ -68,9 +72,9 @@ class Controller:
         print "Done"
 
     def start_nginx(self):
+        print "Creating nginx container"
         self.cleanup("mynginx")
 
-        print "Creating nginx container"
         nginx = self.client.containers.create(image="nginx",
                                    ports={'80/tcp': 80},
                                    volumes={NGINX_CONF_PATH:
@@ -87,9 +91,16 @@ class Controller:
         nginx.start()
     
     def restart_nginx(self):
-        print "Creating nginx container"
+        print "Restarting nginx container"
         nginx = self.client.containers.get("mynginx")
         nginx.restart()
+
+    def stop_container(self, name, environment):
+        print "Stop container {0}:{1}".format(name, environment)
+        container = self.client.containers.get("{0}:{1}".format(name, environment))
+        print "container flushing: " + container.name
+        container.stop()
+        container.remove()
 
     def provision(self, app, branch="master"):
         print "Provisioning " + app + " @ branch " + branch
@@ -107,7 +118,7 @@ class Controller:
             environment = 'preprod' if branch == 'preprod' else 'test'
             try:
                 to_stop = self.file_confs[environment][0]
-                print "Stop container {0}:{1}".format(to_stop, environment)
+                self.stop_container(to_stop, environment)
                 self.file_confs[environment] = []
             except:
                 pass
@@ -130,20 +141,16 @@ class Controller:
         #print "{0} @ {1}/{2}".format("output", NGINX_CONF_PATH, filename)
         #print "Git clone/pull from: {0}".format(args['git'])
         #print "Repo to {0}".format(repo_folder)
-        if True:
+        if False:
             if not os.path.exists(repo_folder):
-#                print "Trying to get repo: " + app
                 Repo.clone_from(args['git']['url'], repo_folder)
-#                print "Clone repo done: " + app
                 repo = Git(repo_folder)
             else:
-#                print "Trying to pull repo: " + app
                 repo = Git(repo_folder)
-#                print "Pull repo done: " + app
                 repo.pull()
             repo.checkout(branch)
 
-#        print "docker build -t {0}:{1} {2}/{0}/{1}/".format(args['name'], environment, BASE_REPOS_PATH)
+        print "docker build -t {0}:{1} {2}/{0}/{1}/".format(args['name'], environment, BASE_REPOS_PATH)
         tt = self.client.images.build(path=os.path.join(BASE_REPOS_PATH, args['name'], environment),
                           tag="%s_%s" % (args['name'], environment),
                           stream=True,
@@ -170,6 +177,8 @@ class Controller:
         self.client.networks.get("my_bridge").connect("%s_%s" % (args['name'], environment))
         self.client.networks.get("bridge").disconnect("%s_%s" % (args['name'], environment))
         container.start()
+        print "Containers:"
+        print self.file_confs
 
     def clean(self):
         pass

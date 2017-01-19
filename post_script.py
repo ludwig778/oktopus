@@ -22,6 +22,7 @@ def hello(repo):
 @app.get('/add/<repo>/<branch>')
 def add(repo, branch):
     ctrl.provision(repo, branch)
+    ctrl.restart_nginx()
 
 def main():
     ctrl.start()
