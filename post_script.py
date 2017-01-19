@@ -26,6 +26,7 @@ def add(repo, branch):
 
 def main():
     ctrl.clean_all()
+    ctrl.cleanup("mynginx")
     ctrl.start()
 
 main()
@@ -34,6 +35,7 @@ try:
 except KeyboardInterrupt:
     print "Keyboard escape"
     ctrl.clean_all()
+    ctrl.cleanup("mynginx")
 except Exception, e:
     print "Unexpected error"
     print e
