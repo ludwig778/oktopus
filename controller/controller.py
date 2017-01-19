@@ -99,7 +99,7 @@ class Controller:
         print "Stop container {0}:{1}".format(name, environment)
         container = self.client.containers.get("{0}:{1}".format(name, environment))
         print "container flushing: " + container.name
-        container.stop()
+        container.stop(timeout=20)
         container.remove()
 
     def provision(self, app, branch="master"):
