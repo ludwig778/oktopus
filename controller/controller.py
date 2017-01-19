@@ -35,10 +35,10 @@ class Controller:
       
     def cleanup(self, name):  
         print "Cleanup " + name
+        container = self.client.containers.get(name)
         print "container flushing: " + container.name
         for i in range(0, 3):
             try:
-                container = self.client.containers.get(name)
                 container.stop()
                 container.remove()
             except docker.errors.NotFound:
