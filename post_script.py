@@ -25,13 +25,14 @@ def add(repo, branch):
     ctrl.restart_nginx()
 
 def main():
+    ctrl.clean_all()
     ctrl.start()
 
 main()
 try:
     run(app, host='0.0.0.0', port=8909)
 except KeyboardInterrupt:
-    ctrl.clean()
+    ctrl.clean_all()
 except Exception, e:
     print "Unexpected error"
     print e
