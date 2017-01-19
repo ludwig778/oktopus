@@ -96,8 +96,8 @@ class Controller:
         nginx.restart()
 
     def stop_container(self, name, environment):
-        print "Stop container {0}:{1}".format(name, environment)
-        container = self.client.containers.get("{0}:{1}".format(name, environment))
+        print "Stop container {0}_{1}".format(name, environment)
+        container = self.client.containers.get("{0}_{1}".format(name, environment))
         print "container flushing: " + container.name
         container.stop()
         container.remove()
