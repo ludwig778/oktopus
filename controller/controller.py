@@ -41,18 +41,16 @@ class Controller:
                 container.stop()
                 container.remove()
             except docker.errors.NotFound:
-                break
+                return
             except requests.exceptions.ReadTimeout:
-                print "osef"
+                pass
             except Exception, e:
                 print "ERROR"
                 print e
                 if i == 2:
                     print "Too much error, quiting..."
                     exit(1)
-            finally:
-                print "Flushing done"
-                break
+        print "Flushing done"
 
     def start(self):
         print "Erasing previous nginx confs..."
