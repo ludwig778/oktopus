@@ -1,6 +1,7 @@
 import os
 import docker
 import json
+import requests
 from time import sleep
 from git import Repo, Git
 import yaml
@@ -43,6 +44,8 @@ class Controller:
                 print "Flushing done"
             except docker.errors.NotFound:
                 break
+            except requests.exceptions.ReadTimeout:
+                print "osef"
             except Exception, e:
                 print "ERROR"
                 print e
