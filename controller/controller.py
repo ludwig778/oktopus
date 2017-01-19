@@ -52,6 +52,7 @@ class Controller:
                     exit(1)
             finally:
                 print "Flushing done"
+                break
 
     def start(self):
         print "Erasing previous nginx confs..."
