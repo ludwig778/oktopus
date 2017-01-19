@@ -120,7 +120,8 @@ class Controller:
                 to_stop = self.file_confs[environment][0]
                 self.stop_container(to_stop, environment)
                 self.file_confs[environment] = []
-            except:
+            except Exception, e:
+                print e
                 pass
 
 #        print args
