@@ -35,13 +35,12 @@ class Controller:
       
     def cleanup(self, name):  
         print "Cleanup " + name
+        print "container flushing: " + container.name
         for i in range(0, 3):
             try:
                 container = self.client.containers.get(name)
-                print "container flushing: " + container.name
                 container.stop()
                 container.remove()
-                print "Flushing done"
             except docker.errors.NotFound:
                 break
             except requests.exceptions.ReadTimeout:
@@ -52,6 +51,8 @@ class Controller:
                 if i == 2:
                     print "Too much error, quiting..."
                     exit(1)
+            finally:
+                print "Flushing done"
 
     def start(self):
         print "Erasing previous nginx confs..."
