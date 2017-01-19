@@ -99,7 +99,7 @@ class Controller:
         print "Stop container {0}:{1}".format(name, environment)
         container = self.client.containers.get("{0}:{1}".format(name, environment))
         print "container flushing: " + container.name
-        container.stop(20)
+        container.stop()
         container.remove()
 
     def provision(self, app, branch="master"):
@@ -181,8 +181,11 @@ class Controller:
         print "Containers:"
         print self.file_confs
 
-    def clean(self):
-        pass
+    def clean_all(self):
+        print "Clean all containers"
+        for container in self.client.containers.list():
+            if container.name.split('_')[0] in self.datas['apps'].keys():
+                self.cleanup(container.name)
 
     def preprovision(self, repo, webhook):
         datas = ""
