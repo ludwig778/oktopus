@@ -136,10 +136,10 @@ class Controller:
 #        print filename
 #        print output
         try:
-            self.file_confs[environment].append(args['name'])
+            if not args['name'] in self.file_confs[environment]:
+                self.file_confs[environment].append(args['name'])
         except:
             self.file_confs[environment] = [args['name']]
-
         repo_folder = os.path.join(BASE_REPOS_PATH, args['name'], environment)
         #print "{0} @ {1}/{2}".format("output", NGINX_CONF_PATH, filename)
         #print "Git clone/pull from: {0}".format(args['git'])
